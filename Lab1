@@ -1,52 +1,27 @@
-from datetime import datetime # модуль
-# скачиваем все файлы
+from datetime import datetime # это модуль
+import urllib.request # модуль, который позволяет читать ссылки 
+
 FORMAT = '%Y.%m.%d.%H.%M.%S'
 ext='.csv'
+url1='https://www.star.nesdis.noaa.gov/smcd/emb/vci/VH/get_TS_admin.php?country=UKR&provinceID='
+url2='&year1=1981&year2=2020&type=Mean'
+path = r'C:\Users\Margo\anaconda3\Laba1 test files\vhi_id_16_'
 
-province=1
-while province<=27:
-    if (province!=12) and (province!=20):
-        url1='https://www.star.nesdis.noaa.gov/smcd/emb/vci/VH/get_TS_admin.php?country=UKR&provinceID='
-        url2='&year1=1981&year2=2020&type=Mean'
-        url3='%s%s%s' %(url1, province, url2)
-        import urllib.request # модуль, который позволяет читать ссылки 
-        vhi_url = urllib.request.urlopen(url3) #открываем ссылку
-        path = r'C:\Users\Margo\anaconda3\Laba1 test files\vhi_id_16_'
-        new_path = '%s_%s_%s%s' % (path, province, datetime.now().strftime(FORMAT), ext)
-        with open(new_path,'wb') as out: #открываем файл для записи
-            out.write(vhi_url.read())  #записываем в файл то что считали с открытой ссылки
-            out.close() #закрываем файл
-        print ("VHI is downloaded.")
-        province+=1
-    else:
-        province+=1
-print ("download finished.")
+dict_province = {1: '22', 2:'24', 3:'23', 4:'25', 5:'03', 6:'04', 7:'08', 8:'19', 9:'20', 10:'21', 
+            11:'09', 13:'10', 14:'11', 15:'12', 16:'13', 17:'14', 18:'15', 19:'16', 21:'17', 
+            22:'18', 23:'06', 24:'01', 25:'02', 26:'07', 27:'05'}
 
-# переименовываем файлы так как они должны быть
+for province in dict_province.keys():
+    url3=f'{url1}{province}{url2}'
+    vhi_url = urllib.request.urlopen(url3) #открываем ссылку
+    newname=dict_province[province]
+    new_path = f'{path}_{newname}_{datetime.now().strftime(FORMAT)}{ext}'
+    with open(new_path,'wb') as out: #открываем файл для записи
+        out.write(vhi_url.read())  #записываем в файл то что считали с открытой ссылки
+    print(f"VHI {province} is downloaded.")
 
-from pathlib import Path # берем из модуля pathlib (библиотека для работы с путями) класс Path
-import os
-
-path = Path(r'C:\Users\Margo\anaconda3\Laba1 test files\\')
-mask = '*.csv'
-    
-for files in path.glob(mask):  # находит все файлы которые соответствуют маске
-    t=files.name
-    print("old name: ", t) 
-    x = t.split("_")
-    dict = {'1': '22', '2':'24', '3':'23', '4':'25', '5':'03', '6':'04', '7':'08', '8':'19', '9':'20', '10':'21', 
-            '11':'09', '13':'10', '14':'11', '15':'12', '16':'13', '17':'14', '18':'15', '19':'16', '21':'17', 
-            '22':'18', '23':'06', '24':'01', '25':'02', '26':'07', '27':'05'}
-#    print("x1= ", x) 
-    x[4]=dict.get(x[4])
-#    print("x2= ", x)
-    new='_'.join(x) #объединяет элементы списка, вставляя между ними _
-    print("new name: ", new)
-    directory = r'C:\Users\Margo\anaconda3\Laba1 test files'
-    old_file = os.path.join(directory, t)
-    new_file = os.path.join(directory, new)
-    os.rename(old_file, new_file)  #переименовывает файл. os работает с операцинной системой
-    print("file renamed") 
+        
+print("download finished.")
 
 # выводим с названиями областей в правильном порядке
 import pandas as pd 
@@ -54,39 +29,40 @@ from pathlib import Path
 import os 
 import glob #находит все пути, совпадающие с заданным шаблоном 
 
-dict = {'01':'Вінницька область', '02':'Волинська область', '03':'Дніпропетровська область', '04':'Донецька область', 
-        '05':'Житомирська область', '06':'Закарпатська область', '07':'Запорізька область', '08':'Івано-Франківська область', 
-        '09':'Київська область', '10':'Кіровоградська область', '11':'Луганська область', '12':'Львівська область', 
-        '13':'Миколаївська область', '14':'Одеська область', '15':'Полтавська область', '16':'Рівенська область', 
-        '17':'Сумська область', '18':'Тернопільська область', '19':'Харківська область', '20': 'Херсонська область', 
-        '21':'Хмельницька область', '22':'Черкаська область', '23':'Чернівецька область', '24':'Чернігівська область', 
-        '25':'Республіка Крим'}
+dict_names = {
+    '01':'Вінницька область', '02':'Волинська область', '03':'Дніпропетровська область',
+    '04':'Донецька область', '05':'Житомирська область', '06':'Закарпатська область', 
+    '07':'Запорізька область', '08':'Івано-Франківська область', '09':'Київська область', 
+    '10':'Кіровоградська область', '11':'Луганська область', '12':'Львівська область', 
+    '13':'Миколаївська область', '14':'Одеська область', '15':'Полтавська область', 
+    '16':'Рівенська область', '17':'Сумська область', '18':'Тернопільська область', 
+    '19':'Харківська область', '20': 'Херсонська область', '21':'Хмельницька область', 
+    '22':'Черкаська область', '23':'Чернівецька область', '24':'Чернігівська область', 
+    '25':'Республіка Крим'}
 
 
 mask = '*.csv' 
 path = Path(r'C:\Users\Margo\anaconda3\Laba1 test files\\')
 
-
 def Readfile(path):
-    df = pd.read_csv(path, sep = ',', index_col=7 ) 
-    df.columns = ['Year', 'Week', 'SMN', 'SMT', 'VCI', 'TCI', 'VHI', 'Trash', 'Trash1']    
+    df = pd.read_csv(path, sep = ',' )
+    df.columns = ['Year', 'Week', 'SMN', 'SMT', 'VCI', 'TCI', 'VHI', 'Trash', 'Trash1', '10']    
     p=str(path)
     index = p.split("_")[4]
-    df['Region'] = dict.get(index)
-    del df['Trash']
-    del df['Trash1']
+    df['Region'] = dict_names.get(index)
+    df = df[['Year', 'Week','Region', 'SMN', 'SMT', 'VCI', 'TCI', 'VHI']]
     return df
 
 
 mydir = os.path.abspath(os.curdir) #возвращает абсолютный путь для директории в которй мы сейчас находимся
 df = pd.concat([Readfile(file) for file in path.glob(mask)], ignore_index=True) #собирает фреймы вместе, не учитывая колонку индексов каждого из них 
 df = df.loc[(df['VHI'] != -1) & (df.Year != '</pre></tt>')]  # убираем лишние строчки
-df.drop(df.tail(1).index,inplace=True) #удаляем последнюю строчку из исходного датафрейма
 df.drop(df.index[[]]) 
 
 #VHI області за рік. min,max
+
 def filter(df): 
-    df_filtered = df.loc[(df['Year']== '2000') & (df['Region'] == 'Київська область')] #выбирает в фрейм то что имеет заданную особенность
+    df_filtered = df.loc[(df['Year']== '2000') & (df['Region'] == 'Вінницька область')] #выбирает в фрейм то что имеет заданную особенность
     return df_filtered
 
 print("filtered dataframe:\n",filter(df))
@@ -95,14 +71,57 @@ print("VHI min:",filter(df)['VHI'].min())
 
 #Ряд VHI за всі роки для області, виявити роки з екстремальними посухами
 def filter(df): 
-    df_filtered = df.loc[(df['Region'] == 'Одеська область')& (df['VHI'] > 15) & (df['VHI'] < 35)]
-    return df_filtered
-
-print("filtered dataframe:\n",filter(df))
-
-#Ряд VHI за всі роки для області, виявити роки з помірними посухами
-def Filter(df): 
     df_filtered = df.loc[(df['Region'] == 'Одеська область')& (df['VHI'] < 15)]
     return df_filtered
 
-print("filtered dataframe:\n",Filter(df))
+print("Years of extreme droughts in this area:\n",filter(df))
+
+#Ряд VHI за всі роки для області, виявити роки з помірними посухами
+def filter(df): 
+    df_filtered = df.loc[(df['Region'] == 'Одеська область')& (df['VHI'] > 15) & (df['VHI'] < 35)]
+    return df_filtered
+
+# print("Years of moderate droughts in this area:\n",filter(df))
+print (df['Region'])
+
+#вивести min VHI, max VHI
+df1=df.groupby(['Week']).agg({'VHI': [('min VHI', 'min'), ('max VHI', 'max')]})
+df1 ['VHI']
+
+# те ж саме але по місяцях
+# добавляем столбик с месяцем
+import math
+
+dict_month={
+    1:'01 Січень', 2:'02 Лютий', 3:'03 Березень', 4:'04 Квітень', 5:'05 Травень', 6:'06 Червень', 
+    7:'07 Липень', 8:'08 Серпень', 9:'09 Вересень', 10:'10 Жовтень', 11:'11 Листопад', 12:'12 Грудень'}
+df1=df
+
+def mont(x):
+    if x<49:
+        m=math.ceil(x/4)  #округляем вверх
+    else: 
+        m=12   
+    t=dict_month[m]
+    y=t
+    return y            
+                        
+df1['Month'] = df1['Week'].apply(mont)         
+df1
+
+df2=df1.groupby(['Month']).agg({'VHI': [('min VHI', 'min'), ('max VHI', 'max')]})
+df2['VHI']
+
+
+# середнє знач за 2000-20009, 2010-2020
+
+df1=df[(df['Year']>='2000') & (df['Year']<='2009')]
+df1=df1.groupby(['Week']).agg({'VHI': [('min VHI 2000-2009', 'min'), ('max VHI 2000-2009', 'max')]})
+df1['VHI']
+
+df2=df[(df['Year']>='2010') & (df['Year']<='2020')] 
+df2=df2.groupby(['Week']).agg({'VHI': [('min VHI 2010-2020', 'min'), ('max VHI 2010-2020', 'max')]})
+df2['VHI']
+
+df3=pd.merge(df1,df2, left_on='Week', right_on='Week')
+df3['VHI']
